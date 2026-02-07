@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Abstract Reasoning Practice Test — Ignite対策</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI','Hiragino Sans',sans-serif;background:#f0f2f5;color:#1a1a2e;min-height:100vh}
+.screen{display:none;max-width:860px;margin:0 auto;padding:24px 20px}
+.screen.active{display:block}
+
+/* Start Screen */
+#start{text-align:center;padding-top:10vh}
+#start h1{font-size:2.2em;color:#4361ee;margin-bottom:6px;line-height:1.2}
+#start .sub{font-size:1.1em;color:#666;margin-bottom:32px}
+.info-box{background:#fff;border-radius:16px;padding:28px;margin:0 auto 32px;max-width:400px;box-shadow:0 2px 12px rgba(0,0,0,.07)}
+.info-box p{font-size:1.05em;margin:8px 0;color:#444}
+.info-box p span{font-weight:700;color:#1a1a2e}
+.btn{display:inline-block;padding:14px 48px;border:none;border-radius:12px;font-size:1.15em;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-primary{background:#4361ee;color:#fff}
+.btn-primary:hover{background:#3a56d4;transform:translateY(-1px)}
+.btn-sm{padding:10px 24px;font-size:.95em;border-radius:10px}
+.btn-outline{background:#fff;color:#4361ee;border:2px solid #4361ee}
+.btn-outline:hover{background:#eef1ff}
+
+/* Test Screen */
+.test-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding:12px 20px;background:#fff;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.progress-text{font-size:1em;font-weight:600;color:#666}
+.progress-text b{color:#4361ee;font-size:1.2em}
+.timer{font-size:1.3em;font-weight:700;color:#4361ee;font-variant-numeric:tabular-nums}
+.timer.warn{color:#e63946;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+.progress-bar{height:4px;background:#e0e0e0;border-radius:2px;margin-bottom:20px;overflow:hidden}
+.progress-fill{height:100%;background:#4361ee;border-radius:2px;transition:width .3s}
+
+.q-card{background:#fff;border-radius:16px;padding:28px;box-shadow:0 2px 12px rgba(0,0,0,.07);margin-bottom:20px}
+.q-instruction{font-size:1em;color:#555;margin-bottom:18px;font-weight:500}
+.q-type-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75em;font-weight:600;margin-bottom:10px}
+.badge-sequence{background:#eef1ff;color:#4361ee}
+.badge-matrix{background:#e8f8f5;color:#0ea573}
+.badge-oddone{background:#fef3e2;color:#d68910}
+.badge-analogy{background:#fde8ef;color:#c0392b}
+.badge-spatial{background:#eae4f7;color:#7d3c98}
+
+/* Frames Display */
+.frames-row{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:24px}
+.frame-box{width:90px;height:90px;border:2.5px solid #ddd;border-radius:10px;background:#fafbfc;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.frame-box svg{width:70px;height:70px}
+.frame-arrow{font-size:1.4em;color:#bbb;font-weight:700}
+.frame-q{border-color:#4361ee;border-style:dashed;background:#f8f9ff}
+
+/* Matrix Grid */
+.matrix-grid{display:inline-grid;gap:6px;margin:0 auto 24px;justify-content:center}
+.matrix-grid .frame-box{width:80px;height:80px}
+.matrix-grid .frame-box svg{width:60px;height:60px}
+
+/* Combination Layout */
+.combo-row{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:8px}
+.combo-op{font-size:1.3em;font-weight:700;color:#999;width:30px;text-align:center}
+
+/* Options */
+.options-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.option-btn{display:flex;align-items:center;gap:12px;padding:12px 16px;border:2.5px solid #e0e0e0;border-radius:12px;background:#fff;cursor:pointer;transition:all .15s}
+.option-btn:hover{border-color:#4361ee;background:#f8f9ff}
+.option-btn.selected{border-color:#4361ee;background:#eef1ff}
+.option-btn.correct{border-color:#2ec4b6;background:#e8faf8}
+.option-btn.wrong{border-color:#e63946;background:#fdedef}
+.option-label{font-weight:700;font-size:1.1em;color:#4361ee;min-width:24px}
+.option-svg{width:60px;height:60px;flex-shrink:0}
+.option-svg svg{width:100%;height:100%}
+
+/* Navigation */
+.nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.q-counter{display:flex;gap:5px;flex-wrap:wrap;justify-content:center}
+.q-dot{width:28px;height:28px;border-radius:50%;border:2px solid #ddd;display:flex;align-items:center;justify-content:center;font-size:.7em;font-weight:600;cursor:pointer;transition:all .15s;color:#999;background:#fff}
+.q-dot:hover{border-color:#4361ee}
+.q-dot.current{border-color:#4361ee;background:#4361ee;color:#fff}
+.q-dot.answered{border-color:#2ec4b6;background:#2ec4b6;color:#fff}
+
+/* Results Screen */
+#results{text-align:center;padding-top:40px}
+.score-circle{width:160px;height:160px;border-radius:50%;border:8px solid #4361ee;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 24px}
+.score-num{font-size:2.8em;font-weight:800;color:#4361ee;line-height:1}
+.score-den{font-size:1em;color:#888;margin-top:2px}
+.score-pct{font-size:1.1em;color:#666;margin-bottom:28px}
+.cat-section{text-align:left;max-width:500px;margin:0 auto 28px}
+.cat-section h3{font-size:1.05em;margin-bottom:14px;color:#333}
+.cat-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.cat-name{min-width:120px;font-size:.9em;font-weight:600;color:#555}
+.cat-bar-bg{flex:1;height:20px;background:#e8e8e8;border-radius:10px;overflow:hidden}
+.cat-bar-fill{height:100%;border-radius:10px;transition:width .6s}
+.cat-score{min-width:48px;font-size:.85em;font-weight:700;color:#555;text-align:right}
+.weakness-box{background:#fff3cd;border-radius:12px;padding:18px;margin:0 auto 28px;max-width:500px;text-align:left}
+.weakness-box h4{color:#856404;margin-bottom:6px}
+.weakness-box p{color:#664d03;font-size:.95em;line-height:1.5}
+.review-section{text-align:left;max-width:600px;margin:0 auto 32px}
+.review-section h3{margin-bottom:14px;color:#333}
+.review-item{background:#fff;border-radius:12px;padding:16px;margin-bottom:12px;border-left:4px solid #e63946;box-shadow:0 1px 6px rgba(0,0,0,.05)}
+.review-item .ri-head{display:flex;justify-content:space-between;font-weight:600;margin-bottom:6px}
+.review-item .ri-exp{font-size:.9em;color:#555;line-height:1.5}
+.review-frames{display:flex;gap:6px;align-items:center;margin:8px 0}
+.review-frames .frame-box{width:50px;height:50px;border-width:2px}
+.review-frames .frame-box svg{width:36px;height:36px}
+
+@media(max-width:600px){
+  .frames-row{gap:4px}
+  .frame-box{width:68px;height:68px}
+  .frame-box svg{width:52px;height:52px}
+  .options-grid{grid-template-columns:1fr}
+  .q-card{padding:18px}
+  #start h1{font-size:1.7em}
+}
+</style>
+</head>
+<body>
+
+<div id="start" class="screen active">
+  <h1>Abstract Reasoning<br>模擬テスト</h1>
+  <p class="sub">Glenunga International — Ignite 対策</p>
+  <div class="info-box">
+    <p>📝 問題数: <span>15問</span></p>
+    <p>⏱ 制限時間: <span>15分</span></p>
+    <p>📊 カテゴリー: パターン認識・マトリックス・仲間はずれ・類推・空間認識</p>
+    <p style="margin-top:16px;font-size:.9em;color:#888">各問題の図形パターンを見て、<br>「？」に入るものを4つの選択肢から選んでね</p>
+  </div>
+  <button class="btn btn-primary" onclick="startTest()">テスト開始 ▶</button>
+</div>
+
+<div id="test" class="screen">
+  <div class="test-header">
+    <div class="progress-text">Q <b id="qnum">1</b> / 15</div>
+    <div class="timer" id="timer">15:00</div>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="pbar"></div></div>
+  <div class="q-card">
+    <div id="q-badge"></div>
+    <div class="q-instruction" id="q-inst"></div>
+    <div id="q-display" style="display:flex;flex-direction:column;align-items:center"></div>
+    <div class="options-grid" id="q-options"></div>
+  </div>
+  <div class="nav-row">
+    <button class="btn btn-sm btn-outline" onclick="go(-1)">◀ 前へ</button>
+    <div class="q-counter" id="q-dots"></div>
+    <button class="btn btn-sm btn-primary" id="next-btn" onclick="go(1)">次へ ▶</button>
+  </div>
+</div>
+
+<div id="results" class="screen">
+  <div id="results-content"></div>
+</div>
+
+<script>
+// ========== SVG HELPERS ==========
+const S = {
+  w: (c) => `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">${c}</svg>`,
+
+  poly: (cx,cy,sides,r,rot=-90,fill='none',sk='#2d3436',sw=2.5) => {
+    const pts=[];
+    for(let i=0;i<sides;i++){
+      const a=2*Math.PI*i/sides+rot*Math.PI/180;
+      pts.push(`${cx+r*Math.cos(a)},${cy+r*Math.sin(a)}`);
+    }
+    return `<polygon points="${pts.join(' ')}" fill="${fill}" stroke="${sk}" stroke-width="${sw}" stroke-linejoin="round"/>`;
+  },
+
+  circ:(cx,cy,r,fill='none',sk='#2d3436',sw=2.5)=>
+    `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${fill}" stroke="${sk}" stroke-width="${sw}"/>`,
+
+  rect:(x,y,w,h,fill='none',sk='#2d3436',sw=2.5)=>
+    `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}" stroke="${sk}" stroke-width="${sw}"/>`,
+
+  ln:(x1,y1,x2,y2,sk='#2d3436',sw=2.5)=>
+    `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${sk}" stroke-width="${sw}" stroke-linecap="round"/>`,
+
+  dot:(cx,cy,r=8,fill='#2d3436')=>
+    `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${fill}" stroke="none"/>`,
+
+  arrow:(cx,cy,rot=0,sz=24,fill='#2d3436')=>{
+    const p=`${cx},${cy-sz} ${cx-sz*.55},${cy+sz*.35} ${cx},${cy+sz*.08} ${cx+sz*.55},${cy+sz*.35}`;
+    return `<polygon points="${p}" fill="${fill}" transform="rotate(${rot},${cx},${cy})" stroke-linejoin="round"/>`;
+  },
+
+  qm:()=>`<text x="50" y="54" text-anchor="middle" dominant-baseline="central" font-size="46" font-weight="800" fill="#4361ee" font-family="Arial">?</text>`,
+
+  dots:(n,fill='#2d3436',r=8)=>{
+    const P={1:[[50,50]],2:[[35,50],[65,50]],3:[[50,32],[33,64],[67,64]],
+      4:[[35,35],[65,35],[35,65],[65,65]],5:[[50,22],[28,44],[72,44],[34,72],[66,72]],
+      6:[[35,28],[65,28],[35,50],[65,50],[35,72],[65,72]]};
+    return(P[n]||[]).map(([x,y])=>S.dot(x,y,r,fill)).join('');
+  },
+
+  lShape:(rot=0,mirror=false,fill='#2d3436')=>{
+    const pts="28,18 44,18 44,60 74,60 74,78 28,78";
+    let t='';
+    if(mirror) t+=`translate(100,0) scale(-1,1) `;
+    if(rot) t+=`rotate(${rot},50,50)`;
+    return `<polygon points="${pts}" fill="${fill}"${t?` transform="${t}"`:''} stroke="none"/>`;
+  },
+
+  star:(cx,cy,r=25,fill='none',sk='#2d3436',sw=2.5)=>{
+    const pts=[];
+    for(let i=0;i<5;i++){
+      const ao=-Math.PI/2+2*Math.PI*i/5;
+      const ai=-Math.PI/2+2*Math.PI*(i+.5)/5;
+      pts.push(`${cx+r*Math.cos(ao)},${cy+r*Math.sin(ao)}`);
+      pts.push(`${cx+r*.4*Math.cos(ai)},${cy+r*.4*Math.sin(ai)}`);
+    }
+    return `<polygon points="${pts.join(' ')}" fill="${fill}" stroke="${sk}" stroke-width="${sw}" stroke-linejoin="round"/>`;
+  }
+};
+
+// ========== QUESTIONS ==========
+const questions = [
+  // Q1: Arrow Rotation
+  {
+    type:'sequence', cat:'pattern', catJa:'パターン認識',
+    badge:'badge-sequence', inst:'矢印の向きの規則を見つけて、「？」に入るものを選んでね',
+    frames:[
+      S.w(S.arrow(50,50,0)),
+      S.w(S.arrow(50,50,90)),
+      S.w(S.arrow(50,50,180)),
+      S.w(S.qm())
+    ],
+    options:[
+      S.w(S.arrow(50,50,90)),
+      S.w(S.arrow(50,50,0)),
+      S.w(S.arrow(50,50,270)),
+      S.w(S.arrow(50,50,180))
+    ],
+    correct:2,
+    exp:'矢印は毎回90°ずつ時計回りに回転しています。上→右→下の次は「左」です。'
+  },
+
+  // Q2: Dot Count
+  {
+    type:'sequence', cat:'pattern', catJa:'パターン認識',
+    badge:'badge-sequence', inst:'黒い丸の数の規則を見つけて、「？」に入るものを選んでね',
+    frames:[
+      S.w(S.dots(1)),
+      S.w(S.dots(2)),
+      S.w(S.dots(3)),
+      S.w(S.qm())
+    ],
+    options:[
+      S.w(S.dots(3)),
+      S.w(S.dots(4)),
+      S.w(S.dots(5)),
+      S.w(S.dots(6))
+    ],
+    correct:1,
+    exp:'丸の数が1→2→3と1つずつ増えています。次は4つです。'
+  },
+
+  // Q3: Shape Sides
+  {
+    type:'sequence', cat:'pattern', catJa:'パターン認識',
+    badge:'badge-sequence', inst:'図形の変化の規則を見つけて、「？」に入るものを選んでね',
+    frames:[
+      S.w(S.poly(50,54,3,30)),
+      S.w(S.poly(50,50,4,30,45)),
+      S.w(S.poly(50,50,5,30)),
+      S.w(S.qm())
+    ],
+    options:[
+      S.w(S.circ(50,50,30,'none')),
+      S.w(S.poly(50,50,8,30)),
+      S.w(S.poly(50,50,6,30)),
+      S.w(S.poly(50,54,3,30))
+    ],
+    correct:2,
+    exp:'辺の数が3→4→5と1つずつ増えています。次は6角形です。'
+  },
+
+  // Q4: Count + Color alternation
+  {
+    type:'sequence', cat:'pattern', catJa:'パターン認識',
+    badge:'badge-sequence', inst:'丸の数と色の両方の規則を見つけて、「？」に入るものを選んでね',
+    frames:[
+      S.w(S.dots(1,'#2d3436',10)),
+      S.w(S.dots(2,'#aaa',10)),
+      S.w(S.dots(3,'#2d3436',10)),
+      S.w(S.qm())
+    ],
+    options:[
+      S.w(S.dots(4,'#2d3436',10)),
+      S.w(S.dots(3,'#aaa',10)),
+      S.w(S.dots(4,'#aaa',10)),
+      S.w(S.dots(5,'#aaa',10))
+    ],
+    correct:2,
+    exp:'数が1→2→3→4と増え、色が黒→灰→黒→灰と交互に変わります。次は灰色の丸が4つです。'
+  },
+
+  // Q5: Odd One Out (sides)
+  {
+    type:'oddone', cat:'oddone', catJa:'仲間はずれ',
+    badge:'badge-oddone', inst:'4つの図形のうち、仲間はずれを1つ選んでね',
+    frames:[
+      S.w(S.poly(50,50,4,30,45)),
+      S.w(S.rect(22,30,56,40)),
+      S.w(S.poly(50,50,4,30,0)),
+      S.w(S.poly(50,54,3,30))
+    ],
+    options:[
+      S.w(S.poly(50,50,4,30,45)),
+      S.w(S.rect(22,30,56,40)),
+      S.w(S.poly(50,50,4,30,0)),
+      S.w(S.poly(50,54,3,30))
+    ],
+    correct:3,
+    exp:'A（正方形）、B（長方形）、C（ひし形）は全て四角形（4辺）ですが、D（三角形）だけ3辺です。'
+  },
+
+  // Q6: 2x2 Matrix
+  {
+    type:'matrix2', cat:'matrix', catJa:'マトリックス',
+    badge:'badge-matrix', inst:'表の規則を見つけて、「？」に入るものを選んでね',
+    frames:[
+      S.w(S.circ(50,50,28,'#2d3436')),
+      S.w(S.poly(50,50,4,30,45,'#2d3436')),
+      S.w(S.circ(50,50,28,'none')),
+      S.w(S.qm())
+    ],
+    options:[
+      S.w(S.circ(50,50,28,'none')),
+      S.w(S.poly(50,50,4,30,45,'#2d3436')),
+      S.w(S.poly(50,50,4,30,45,'none')),
+      S.w(S.circ(50,50,28,'#2d3436'))
+    ],
+    correct:2,
+    exp:'行ごとに塗りが同じ（1行目=塗りつぶし、2行目=枠のみ）、列ごとに形が同じ（1列目=丸、2列目=四角）。答えは枠のみの四角です。'
+  },
+
+  // Q7: Analogy (size)
+  {
+    type:'analogy', cat:'analogy', catJa:'類推',
+    badge:'badge-analogy', inst:'AとBの関係を見つけて、CとDも同じ関係になるものを選んでね',
+    frames:[
+      S.w(S.star(50,50,32,'#2d3436')),
+      S.w(S.star(50,50,16,'#2d3436')),
+      S.w(S.poly(50,50,4,32,0,'#2d3436')),
+      S.w(S.qm())
+    ],
+    options:[
+      S.w(S.poly(50,50,4,32,0,'none')),
+      S.w(S.poly(50,50,4,16,0,'#2d3436')),
+      S.w(S.star(50,50,16,'none')),
+      S.w(S.poly(50,54,3,16,0,'#2d3436'))
+    ],
+    correct:1,
+    exp:'A（大きい星）→B（小さい星）の関係は「同じ形で小さくなる」。C（大きいひし形）に同じ規則を適用すると、小さいひし形になります。'
+  },
+
+  // Q8: Odd One Out (rotation vs reflection)
+  {
+    type:'oddone', cat:'oddone', catJa:'仲間はずれ',
+    badge:'badge-oddone', inst:'4つのL字型のうち、仲間はずれを1つ選んでね',
+    frames:[
+      S.w(S.lShape(0,false)),
+      S.w(S.lShape(90,false)),
+      S.w(S.lShape(0,true)),
+      S.w(S.lShape(180,false))
+    ],
+    options:[
+      S.w(S.lShape(0,false)),
+      S.w(S.lShape(90,false)),
+      S.w(S.lShape(0,true)),
+      S.w(S.lShape(180,false))
+    ],
+    correct:2,
+    exp:'A、B、Dは同じL字を回転させたものですが、Cだけは左右反転（鏡像）です。回転では作れません。'
+  },
+
+  // Q9: Dot movement
+  {
+    type:'sequence', cat:'spatial', catJa:'空間認識',
+    badge:'badge-spatial', inst:'黒い丸の動きの規則を見つけて、「？」に入るものを選んでね',
+    frames:[
+      S.w(S.rect(20,20,60,60)+S.dot(25,25,8)),
+      S.w(S.rect(20,20,60,60)+S.dot(75,25,8)),
+      S.w(S.rect(20,20,60,60)+S.dot(75,75,8)),
+      S.w(S.rect(20,20,60,60)+S.qm())
+    ],
+    options:[
+      S.w(S.rect(20,20,60,60)+S.dot(50,50,8)),
+      S.w(S.rect(20,20,60,60)+S.dot(25,25,8)),
+      S.w(S.rect(20,20,60,60)+S.dot(75,25,8)),
+      S.w(S.rect(20,20,60,60)+S.dot(25,75,8))
+    ],
+    correct:3,
+    exp:'丸は四角形の角を時計回りに移動しています。左上→右上→右下→次は左下です。'
+  },
+
+  // Q10: 3x3 Latin Square
+  {
+    type:'matrix3', cat:'matrix', catJa:'マトリックス',
+    badge:'badge-matrix', inst:'3×3の表の規則を見つけて、「？」に入るものを選んでね',
+    frames:[
+      S.w(S.circ(50,50,25,'none')),
+      S.w(S.poly(50,50,4,27,45,'none')),
+      S.w(S.poly(50,54,3,27,-90,'none')),
+      S.w(S.poly(50,50,4,27,45,'none')),
+      S.w(S.poly(50,54,3,27,-90,'none')),
+      S.w(S.circ(50,50,25,'none')),
+      S.w(S.poly(50,54,3,27,-90,'none')),
+      S.w(S.circ(50,50,25,'none')),
+      S.w(S.qm())
+    ],
+    options:[
+      S.w(S.poly(50,54,3,27,-90,'none')),
+      S.w(S.circ(50,50,25,'none')),
+      S.w(S.poly(50,50,4,27,45,'none')),
+      S.w(S.poly(50,50,5,25,-90,'none'))
+    ],
+    correct:2,
+    exp:'各行と各列に、○・□・△が1つずつ入ります。3行目には△と○があるので、？は□です。'
+  },
+
+  // Q11: Rotation + Size
+  {
+    type:'sequence', cat:'spatial', catJa:'空間認識',
+    badge:'badge-spatial', inst:'三角形の大きさと向きの変化の規則を見つけてね',
+    frames:[
+      S.w(S.poly(50,55,3,18,-90,'#2d3436')),
+      S.w(S.poly(50,50,3,24,0,'#2d3436')),
+      S.w(S.poly(50,45,3,30,90,'#2d3436')),
+      S.w(S.qm())
+    ],
+    options:[
+      S.w(S.poly(50,50,3,36,180,'#2d3436')),
+      S.w(S.poly(50,50,3,36,-90,'#2d3436')),
+      S.w(S.poly(50,50,3,24,180,'#2d3436')),
+      S.w(S.poly(50,50,3,18,0,'#2d3436'))
+    ],
+    correct:0,
+    exp:'三角形は毎回90°時計回りに回転し、さらに大きくなっています。次は最も大きい三角形が下向き(180°)です。'
+  },
+
+  // Q12: Shape Combination
+  {
+    type:'combination', cat:'analogy', catJa:'類推',
+    badge:'badge-analogy', inst:'1行目の規則を見つけて、2行目の「？」に入るものを選んでね',
+    row1:[
+      S.w(S.circ(50,50,30)),
+      S.w(S.poly(50,54,3,20,-90)),
+      S.w(S.circ(50,50,30)+S.poly(50,54,3,16,-90,'none','#2d3436',2))
+    ],
+    row2:[
+      S.w(S.poly(50,50,4,30,45)),
+      S.w(S.star(50,50,20)),
+      S.w(S.qm())
+    ],
+    frames:[], // not used for this type
+    options:[
+      S.w(S.star(50,50,30)+S.poly(50,50,4,16,45)),
+      S.w(S.poly(50,50,4,30,45)+S.star(50,50,14)),
+      S.w(S.star(50,50,30)),
+      S.w(S.circ(50,50,30)+S.star(50,50,14))
+    ],
+    correct:1,
+    exp:'1行目：○の中に△を入れる。規則は「1番目の図形の中に2番目を入れる」。2行目も同じで、□の中に★を入れます。'
+  },
+
+  // Q13: Overlay/Addition
+  {
+    type:'sequence', cat:'spatial', catJa:'空間認識',
+    badge:'badge-spatial', inst:'丸の中の線の変化の規則を見つけて、「？」に入るものを選んでね',
+    frames:[
+      S.w(S.circ(50,50,32)+S.ln(18,50,82,50)),
+      S.w(S.circ(50,50,32)+S.ln(18,50,82,50)+S.ln(50,18,50,82)),
+      S.w(S.circ(50,50,32)+S.ln(18,50,82,50)+S.ln(50,18,50,82)+S.ln(27,27,73,73)),
+      S.w(S.circ(50,50,32)+S.qm())
+    ],
+    options:[
+      S.w(S.circ(50,50,32)+S.ln(18,50,82,50)+S.ln(50,18,50,82)+S.ln(27,27,73,73)+S.ln(27,73,73,27)),
+      S.w(S.circ(50,50,32)+S.ln(18,50,82,50)+S.ln(50,18,50,82)),
+      S.w(S.circ(50,50,32)+S.ln(27,27,73,73)+S.ln(27,73,73,27)),
+      S.w(S.circ(50,50,32)+S.ln(18,50,82,50)+S.ln(27,27,73,73))
+    ],
+    correct:0,
+    exp:'毎回線が1本ずつ追加されています。横绚→縦線→斜め線の次は、反対の斜め線が加わって4本になります。'
+  },
+
+  // Q14: Complex Odd One Out (dots = sides)
+  {
+    type:'oddone', cat:'oddone', catJa:'仲間はずれ',
+    badge:'badge-oddone', inst:'図形と中の丸の関係をよく見て、仲間はずれを選んでね',
+    frames:[
+      S.w(S.poly(50,54,3,32,-90)+S.dots(3,'#fff',5)),
+      S.w(S.poly(50,50,4,30,45)+S.dots(4,'#fff',5)),
+      S.w(S.poly(50,50,5,30)+[S.dot(50,35,5,'#fff'),S.dot(35,52,5,'#fff'),S.dot(65,52,5,'#fff'),S.dot(40,70,5,'#fff'),S.dot(60,70,5,'#fff')].join('')),
+      S.w(S.poly(50,50,6,30)+S.dots(4,'#fff',5))
+    ],
+    options:[
+      S.w(S.poly(50,54,3,32,-90)+S.dots(3,'#fff',5)),
+      S.w(S.poly(50,50,4,30,45)+S.dots(4,'#fff',5)),
+      S.w(S.poly(50,50,5,30)+[S.dot(50,35,5,'#fff'),S.dot(35,52,5,'#fff'),S.dot(65,52,5,'#fff'),S.dot(40,70,5,'#fff'),S.dot(60,70,5,'#fff')].join('')),
+      S.w(S.poly(50,50,6,30)+S.dots(4,'#fff',5))
+    ],
+    correct:3,
+    exp:'各図形の中の丸の数は、辺の数と同じです。△=3丸、□=4丸、五角形=5丸。でも六角形に丸が4つしかなく、規則に合いません。'
+  },
+
+  // Q15: Complex 3x3 Matrix (shape + fill)
+  {
+    type:'matrix3', cat:'matrix', catJa:'マトリックス',
+    badge:'badge-matrix', inst:'形と色の両方の規則を見つけて、「？」に入るものを選んでね',
+    frames:[
+      S.w(S.circ(50,50,25,'#2d3436')),
+      S.w(S.poly(50,54,3,27,-90,'#999','#2d3436')),
+      S.w(S.poly(50,50,4,27,45,'none')),
+      S.w(S.poly(50,54,3,27,-90,'none')),
+      S.w(S.poly(50,50,4,27,45,'#2d3436')),
+      S.w(S.circ(50,50,25,'#999','#2d3436')),
+      S.w(S.poly(50,50,4,27,45,'#999','#2d3436')),
+      S.w(S.circ(50,50,25,'none')),
+      S.w(S.qm())
+    ],
+    options:[
+      S.w(S.poly(50,54,3,27,-90,'#2d3436')),
+      S.w(S.circ(50,50,25,'#2d3436')),
+      S.w(S.poly(50,50,4,27,45,'none')),
+      S.w(S.poly(50,54,3,27,-90,'none'))
+    ],
+    correct:0,
+    exp:'各行・各列に○□△が1つずつ、黒・灰・白が1つずつ入ります。3行目は灰□と白○があるので、？は黒△です。'
+  }
+];
+
+// ========== STATE ==========
+let current = 0;
+let answers = new Array(15).fill(-1);
+let timeLeft = 15*60;
+let timerInterval = null;
+let testDone = false;
+
+// ========== RENDERING ==========
+function renderQ(idx) {
+  const q = questions[idx];
+  document.getElementById('qnum').textContent = idx+1;
+  document.getElementById('pbar').style.width = ((idx+1)/15*100)+'%';
+
+  // Badge
+  const badgeMap = {pattern:'パターン認識',matrix:'マトリックス',oddone:'仲間はずれ',analogy:'類推',spatial:'空間認識'};
+  document.getElementById('q-badge').innerHTML = `<span class="q-type-badge ${q.badge}">${badgeMap[q.cat]}</span>`;
+  document.getElementById('q-inst').textContent = q.inst;
+
+  // Display area
+  const disp = document.getElementById('q-display');
+  disp.innerHTML = '';
+
+  if (q.type === 'sequence') {
+    const row = document.createElement('div');
+    row.className = 'frames-row';
+    q.frames.forEach((f,i) => {
+      if(i>0) row.innerHTML += `<span class="frame-arrow">→</span>`;
+      const isQ = i === q.frames.length-1;
+      row.innerHTML += `<div class="frame-box${isQ?' frame-q':''}">${f}</div>`;
+    });
+    disp.appendChild(row);
+  }
+  else if (q.type === 'matrix2') {
+    const grid = document.createElement('div');
+    grid.className = 'matrix-grid';
+    grid.style.gridTemplateColumns = 'repeat(2,80px)';
+    q.frames.forEach((f,i) => {
+      const isQ = i===3;
+      grid.innerHTML += `<div class="frame-box${isQ?' frame-q':''}">${f}</div>`;
+    });
+    disp.appendChild(grid);
+  }
+  else if (q.type === 'matrix3') {
+    const grid = document.createElement('div');
+    grid.className = 'matrix-grid';
+    grid.style.gridTemplateColumns = 'repeat(3,80px)';
+    q.frames.forEach((f,i) => {
+      const isQ = i===8;
+      grid.innerHTML += `<div class="frame-box${isQ?' frame-q':''}">${f}</div>`;
+    });
+    disp.appendChild(grid);
+  }
+  else if (q.type === 'oddone') {
+    const row = document.createElement('div');
+    row.className = 'frames-row';
+    const labels = ['A','B','C','D'];
+    q.frames.forEach((f,i) => {
+      row.innerHTML += `<div style="text-align:center"><div class="frame-box">${f}</div><div style="font-weight:700;color:#666;margin-top:4px">${labels[i]}</div></div>`;
+    });
+    disp.appendChild(row);
+  }
+  else if (q.type === 'analogy') {
+    const row = document.createElement('div');
+    row.className = 'frames-row';
+    row.innerHTML = `
+      <div style="text-align:center"><div class="frame-box">${q.frames[0]}</div><div style="font-weight:600;color:#888;font-size:.8em;margin-top:2px">A</div></div>
+      <span class="frame-arrow">:</span>
+      <div style="text-align:center"><div class="frame-box">${q.frames[1]}</div><div style="font-weight:600;color:#888;font-size:.8em;margin-top:2px">B</div></div>
+      <span class="frame-arrow">=</span>
+      <div style="text-align:center"><div class="frame-box">${q.frames[2]}</div><div style="font-weight:600;color:#888;font-size:.8em;margin-top:2px">C</div></div>
+      <span class="frame-arrow">:</span>
+      <div style="text-align:center"><div class="frame-box frame-q">${q.frames[3]}</div><div style="font-weight:600;color:#888;font-size:.8em;margin-top:2px">D</div></div>
+    `;
+    disp.appendChild(row);
+  }
+  else if (q.type === 'combination') {
+    const wrap = document.createElement('div');
+    wrap.innerHTML = `
+      <div class="combo-row">
+        <div class="frame-box">${q.row1[0]}</div>
+        <span class="combo-op">+</span>
+        <div class="frame-box">${q.row1[1]}</div>
+        <span class="combo-op">=</span>
+        <div class="frame-box">${q.row1[2]}</div>
+      </div>
+      <div class="combo-row">
+        <div class="frame-box">${q.row2[0]}</div>
+        <span class="combo-op">+</span>
+        <div class="frame-box">${q.row2[1]}</div>
+        <span class="combo-op">=</span>
+        <div class="frame-box frame-q">${q.row2[2]}</div>
+      </div>
+    `;
+    disp.appendChild(wrap);
+  }
+
+  // Options
+  const optDiv = document.getElementById('q-options');
+  const labels = ['A','B','C','D'];
+  optDiv.innerHTML = q.options.map((o,i) => {
+    let cls = 'option-btn';
+    if(testDone) {
+      if(i===q.correct) cls += ' correct';
+      else if(answers[idx]===i) cls += ' wrong';
+    } else if(answers[idx]===i) cls += ' selected';
+    return `<div class="${cls}" onclick="selectOpt(${idx},${i})">
+      <span class="option-label">${labels[i]}</span>
+      <div class="option-svg">${o}</div>
+    </div>`;
+  }).join('');
+
+  // Nav dots
+  const dots = document.getElementById('q-dots');
+  dots.innerHTML = '';
+  for(let i=0;i<15;i++){
+    let dc = 'q-dot';
+    if(i===idx) dc += ' current';
+    else if(answers[i]>=0) dc += ' answered';
+    dots.innerHTML += `<div class="${dc}" onclick="jumpTo(${i})">${i+1}</div>`;
+  }
+
+  // Next button text
+  const nb = document.getElementById('next-btn');
+  if(idx===14 && !testDone) nb.textContent = '提出する ✓';
+  else if(testDone) nb.textContent = '結果を見る';
+  else nb.textContent = '次へ ▶';
+}
+
+function selectOpt(qIdx, oIdx) {
+  if(testDone) return;
+  answers[qIdx] = oIdx;
+  renderQ(qIdx);
+}
+
+function jumpTo(idx) {
+  current = idx;
+  renderQ(current);
+}
+
+function go(dir) {
+  if(current===14 && dir===1 && !testDone) {
+    const unanswered = answers.filter(a=>a<0).length;
+    if(unanswered > 0) {
+      if(!confirm(`まだ${unanswered}問未回答です。提出しますか？`)) return;
+    } else {
+      if(!confirm('テストを提出しますか？')) return;
+    }
+    finishTest();
+    return;
+  }
+  if(testDone && current===14 && dir===1) {
+    showResults();
+    return;
+  }
+  current = Math.max(0, Math.min(14, current+dir));
+  renderQ(current);
+}
+
+// ========== TIMER ==========
+function updateTimer() {
+  if(timeLeft<=0){finishTest();return;}
+  timeLeft--;
+  const m=Math.floor(timeLeft/60);
+  const s=timeLeft%60;
+  const el=document.getElementById('timer');
+  el.textContent=`${m}:${s.toString().padStart(2,'0')}`;
+  if(timeLeft<120) el.classList.add('warn');
+}
+
+// ========== TEST CONTROL ==========
+function startTest() {
+  document.getElementById('start').classList.remove('active');
+  document.getElementById('test').classList.add('active');
+  timerInterval = setInterval(updateTimer, 1000);
+  renderQ(0);
+}
+
+function finishTest() {
+  testDone = true;
+  clearInterval(timerInterval);
+  document.getElementById('timer').textContent = '終了';
+  document.getElementById('timer').classList.remove('warn');
+  renderQ(current);
+}
+
+function showResults() {
+  document.getElementById('test').classList.remove('active');
+  document.getElementById('results').classList.add('active');
+
+  let score = 0;
+  const catScores = {};
+  const wrongItems = [];
+
+  questions.forEach((q,i) => {
+    if(!catScores[q.cat]) catScores[q.cat]={correct:0,total:0,ja:q.catJa};
+    catScores[q.cat].total++;
+    if(answers[i]===q.correct){
+      score++;
+      catScores[q.cat].correct++;
+    } else {
+      wrongItems.push(i);
+    }
+  });
+
+  const pct = Math.round(score/15*100);
+  const catColors = {pattern:'#4361ee',matrix:'#0ea573',oddone:'#d68910',analogy:'#c0392b',spatial:'#7d3c98'};
+
+  let html = `
+    <div class="score-circle">
+      <span class="score-num">${score}</span>
+      <span class="score-den">/ 15</span>
+    </div>
+    <p class="score-pct">${pct}%${pct>=80?' 🎉':pct>=60?' 👍':' 💪'}</p>
+    <div class="cat-section">
+      <h3>カテゴリー別スコア</h3>
+      ${Object.entries(catScores).map(([k,v])=>{
+        const p=Math.round(v.correct/v.total*100);
+        return `<div class="cat-row">
+          <span class="cat-name">${v.ja}</span>
+          <div class="cat-bar-bg"><div class="cat-bar-fill" style="width:${p}%;background:${catColors[k]}"></div></div>
+          <span class="cat-score">${v.correct}/${v.total}</span>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+
+  // Weakness analysis
+  const weak = Object.entries(catScores).filter(([k,v])=>v.correct/v.total<0.7);
+  if(weak.length>0) {
+    html += `<div class="weakness-box">
+      <h4>📌 重点対策ポイント</h4>
+      <p>${weak.map(([k,v])=>`<b>${v.ja}</b>（${v.correct}/${v.total}）`).join('、')}が苦手な分野です。この分野の問題を重点的に練習しましょう！</p>
+    </div>`;
+  } else if(score < 15) {
+    html += `<div class="weakness-box" style="background:#d4edda">
+      <h4>✨ 全体的にバランスが良いです</h4>
+      <p>大きな弱点はありません。間違えた問題の解説を確認して、さらにスコアアップを目指しましょう！</p>
+    </div>`;
+  } else {
+    html += `<div class="weakness-box" style="background:#d4edda">
+      <h4>🏆 パーフェクト！</h4>
+      <p>全問正解です。素晴らしい！次はもう少し難しい問題に挑戦してみましょう。</p>
+    </div>`;
+  }
+
+  // Wrong answer review
+  if(wrongItems.length > 0) {
+    html += `<div class="review-section"><h3>間違えた問題の解説</h3>`;
+    wrongItems.forEach(i => {
+      const q = questions[i];
+      const labels = ['A','B','C','D'];
+      html += `<div class="review-item">
+        <div class="ri-head">
+          <span>Q${i+1}（${q.catJa}）</span>
+          <span style="color:#e63946">あなたの答え: ${answers[i]>=0?labels[answers[i]]:'未回答'} → 正解: ${labels[q.correct]}</span>
+        </div>
+        <p class="ri-exp">${q.exp}</p>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  html += `<button class="btn btn-primary" onclick="retryTest()" style="margin-top:8px">もう一度挑戦する</button>`;
+
+  document.getElementById('results-content').innerHTML = html;
+}
+
+function retryTest() {
+  current = 0;
+  answers = new Array(15).fill(-1);
+  timeLeft = 15*60;
+  testDone = false;
+  document.getElementById('results').classList.remove('active');
+  document.getElementById('test').classList.add('active');
+  document.getElementById('timer').textContent = '15:00';
+  document.getElementById('timer').classList.remove('warn');
+  timerInterval = setInterval(updateTimer, 1000);
+  renderQ(0);
+}
+</script>
+</body>
+</html>
